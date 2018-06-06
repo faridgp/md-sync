@@ -1,13 +1,11 @@
 <?php
-class TextProcessor
-{
+class TextProcessor {
 	/**
 	 * @param string $text
 	 *
 	 * @return string
 	 */
-	public function process($text)
-	{
+	public function process($text) {
 		$text = $this->decode($text);
 		return $text;
 	}
@@ -17,12 +15,10 @@ class TextProcessor
 	 *
 	 * @return string
 	 */
-	public function decode($text)
-	{
+	public function decode($text) {
 		return htmlspecialchars_decode(html_entity_decode($text));
 	}
 
 }
-
 
 ?>

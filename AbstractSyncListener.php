@@ -10,16 +10,15 @@ abstract class AbstractSyncListener {
 	protected $_shopExcludeIds = [];
 	protected $_offerExcludeIds = [];
 
-    public function __construct() {
-    	$this->model = Model::getInstance('live', Config::$connection_data_live);
+	public function __construct() {
+		$this->model = Model::getInstance('live', Config::$connection_data_live);
+	}
 
-    }
-
-    public function synchronizeAll() {
+	public function synchronizeAll() {
 		$records = $this->_findRecords();
-        foreach ($records as $record) {
-        	$this->id = $record['id'];
-        	$this->synchronize();
+		foreach ($records as $record) {
+			$this->id = $record['id'];
+			$this->synchronize();
 		}
 	}
 
@@ -67,24 +66,24 @@ abstract class AbstractSyncListener {
 	}
 
 	public function _sendRequest($request) {
-     	$rest = curl_init();
+		$rest = curl_init();
 		curl_setopt($rest, CURLOPT_URL, $request['uri']);
-	    curl_setopt($rest, CURLOPT_HTTPHEADER,  $request['header']);
-	    curl_setopt($rest, CURLOPT_RETURNTRANSFER, true);
-	    curl_setopt($rest, CURLOPT_CUSTOMREQUEST, $request['method']);
-	    curl_setopt($rest, CURLOPT_POSTFIELDS,http_build_query($request['body']));
-	    $response = curl_exec($rest);
-        $http_code = curl_getinfo($rest, CURLINFO_HTTP_CODE);
-        $error = curl_errno($rest);
-        curl_close($rest);
-        if($error){
-        	return null;
-        }
-        $response = json_decode($response, true);
-        return $response;
-    }
+		curl_setopt($rest, CURLOPT_HTTPHEADER,  $request['header']);
+		curl_setopt($rest, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($rest, CURLOPT_CUSTOMREQUEST, $request['method']);
+		curl_setopt($rest, CURLOPT_POSTFIELDS,http_build_query($request['body']));
+		$response = curl_exec($rest);
+		$http_code = curl_getinfo($rest, CURLINFO_HTTP_CODE);
+		$error = curl_errno($rest);
+		curl_close($rest);
+		if($error){
+			return null;
+		}
+		$response = json_decode($response, true);
+		return $response;
+	}
 
-    /**
+	/**
 	 * @param array $record
 	 *
 	 * @return array
@@ -110,7 +109,7 @@ abstract class AbstractSyncListener {
 	}
 
 
-   	/**
+	/**
 	 * @param string $minimumOrderLabel
 	 *
 	 * @return integer

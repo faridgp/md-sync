@@ -91,6 +91,7 @@ class ShopListener extends AbstractSyncListener {
 	];
 	protected $_domainsMap = [];
 	protected $_excludeIds = [];
+
 	/**
 	 * @var array
 	 */
@@ -101,7 +102,7 @@ class ShopListener extends AbstractSyncListener {
 		4 => 4, // Vorauskasse
 		5 => 5, // Nachnahme
 		6 => 6, // Ratenzahlung
-		7 => 7, // Sofortüberweisung
+		7 => 7, // Sofortï¿½berweisung
 		8 => 8, // paysafecard
 		9 => 9, // moneybookers
 		10 => 10, // clickandbuy
@@ -126,6 +127,7 @@ class ShopListener extends AbstractSyncListener {
 		41 => 41, // transferuj
 		42 => 42, // SMS
 	];
+
 	protected $_deliveryMethodsMap = [
 		1 => 1, // DHL
 		2 => 2, // UPS
@@ -144,36 +146,33 @@ class ShopListener extends AbstractSyncListener {
 		15 => 15, // K-EX
 	];
 
-    public function __construct(){
-        parent::__construct();
-    }
-
-   	protected function _findRecords()
-	{
-		$query = "SELECT extern_id id FROM " . $this->_table . " WHERE ch_f1 != '' ORDER BY cq_id ASC";
-        $stm = $this->model->execute($query);
-        if ($data = $this->model->fetchAll($stm)) {
-        	return $data;
-        }
-        return null;
+	public function __construct() {
+		parent::__construct();
 	}
 
-	protected function _findRecord()
-	{
+	protected function _findRecords() {
+		$query = "SELECT extern_id id FROM " . $this->_table . " WHERE ch_f1 != '' ORDER BY cq_id ASC";
+		$stm = $this->model->execute($query);
+		if ($data = $this->model->fetchAll($stm)) {
+			return $data;
+		}
+		return null;
+	}
+
+	protected function _findRecord() {
 		if (in_array($this->id, $this->_excludeIds)) {
 			return null;
 		}
 
 		$query = "SELECT *, extern_id id FROM " . $this->_table . " WHERE extern_id = ? AND ch_f1 != ''";
-        $stm = $this->model->execute($query, [$this->id]);
-        if ($data = $this->model->fetch($stm)) {
-        	return $data;
-        }
-        return null;
+		$stm = $this->model->execute($query, [$this->id]);
+		if ($data = $this->model->fetch($stm)) {
+			return $data;
+		}
+		return null;
 	}
 
-    protected function _formatData(array $record)
-	{
+	protected function _formatData(array $record) {
 		$textProcessor = new TextProcessor();
 		$placeholderProcessor = new PlaceholderProcessor();
 		$urlBuilder = new UrlBuilder();
@@ -198,7 +197,7 @@ class ShopListener extends AbstractSyncListener {
 			'shop_category_id' => $this->_categoriesMap[$record['breadcrumb']],
 			'domain' => $domain,
 			'show_expired_offers' => (bool)$record['show_expired_offers'],
-            'clickout_url' => $urlBuilder->getValidUrl($record['ch_f2']),
+			'clickout_url' => $urlBuilder->getValidUrl($record['ch_f2']),
 			'logo_url' => $urlBuilder->getImageUrl((empty($record['ch_f7']) ? $record['ch_f9'] : $record['ch_f7'])),
 			'minimum_order_label' => $minimumOrderLabel,
 			'url' => $urlBuilder->getValidUrl($record['screenshotUrl']),
@@ -226,7 +225,7 @@ class ShopListener extends AbstractSyncListener {
 						'type' => 2,
 					],
 				],
-                'address' => $textProcessor->decode($this->_formatAddress($record)),
+				'address' => $textProcessor->decode($this->_formatAddress($record)),
 				'contact' => $textProcessor->decode($this->_formatContact($record)),
 			],
 
@@ -253,8 +252,7 @@ class ShopListener extends AbstractSyncListener {
 	 *
 	 * @return string
 	 */
-	protected function _formatDomain($domain)
-	{
+	protected function _formatDomain($domain) {
 		if (array_key_exists($domain, $this->_domainsMap)) {
 			return $this->_domainsMap[$domain];
 		}
@@ -266,8 +264,7 @@ class ShopListener extends AbstractSyncListener {
 	 *
 	 * @return null|string
 	 */
-	protected function _formatAddress(array $shop)
-	{
+	protected function _formatAddress(array $shop) {
 		$city = isset($shop['hiLocation']) ? $shop['hiLocation'] : '';
 		$country = isset($shop['hiCountry']) ? $shop['hiCountry'] : '';
 		if ($country) {
@@ -290,8 +287,7 @@ class ShopListener extends AbstractSyncListener {
 	 *
 	 * @return null|string
 	 */
-	protected function _formatContact(array $shop)
-	{
+	protected function _formatContact(array $shop) {
 		$contact = [
 			$shop['hiHotline'],
 			$shop['hiHotlineE']
@@ -300,13 +296,12 @@ class ShopListener extends AbstractSyncListener {
 		return rtrim(implode(PHP_EOL, $contact));
 	}
 
-   /**
+	/**
 	 * @param array $shop
 	 *
 	 * @return array|null
 	 */
-	protected function _formatPaymentMethods($shop)
-	{
+	protected function _formatPaymentMethods($shop) {
 		if (empty($shop['hiPayment'])) {
 			return null;
 		}
@@ -320,13 +315,13 @@ class ShopListener extends AbstractSyncListener {
 		}
 		return $return;
 	}
+
 	/**
 	 * @param array $shop
 	 *
 	 * @return array|null
 	 */
-	protected function _formatDeliveryMethods($shop)
-	{
+	protected function _formatDeliveryMethods($shop) {
 		if (empty($shop['hiShippingFrom'])) {
 			return null;
 		}
@@ -346,6 +341,5 @@ class ShopListener extends AbstractSyncListener {
 		$shop->putCgId($this->id, $cqId);
 	}
 }
-
 
 ?>

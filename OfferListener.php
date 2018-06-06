@@ -20,6 +20,7 @@ class OfferListener extends AbstractSyncListener {
 		4 => 3, // GBP
 		1 => 5, // Zl
 	];
+
 	/**
 	 * @var array
 	 */
@@ -33,40 +34,38 @@ class OfferListener extends AbstractSyncListener {
 	const CUSTOMER_ALL = 2;
 
 
-   	public function __construct(){
-        parent::__construct();
-    }
+	public function __construct(){
+		parent::__construct();
+	}
 
-    protected function _findRecord()
-	{
+	protected function _findRecord() {
 		$query = 'SELECT *, extern_id id, IF(dat_f2 <= NOW() AND dat_f2!="0000-00-00 00:00:00" AND (dat_f1 >= NOW() OR dat_f1="0000-00-00 00:00:00"), 1, 0) status FROM ' . $this->_table . ' WHERE extern_id = ? AND ch_f1 != ""';
-        $stm = $this->model->execute($query, [$this->id]);
-        if ($data = $this->model->fetch($stm)) {
-        	return $data;
-        }
-        return null;
+		$stm = $this->model->execute($query, [$this->id]);
+		if ($data = $this->model->fetch($stm)) {
+			return $data;
+		}
+		return null;
 	}
 
-   	protected function _findRecords()
-	{
+	protected function _findRecords() {
 		$query = 'SELECT extern_id id FROM ' . $this->_table . ' WHERE ch_f1 != "" ORDER BY cq_id ASC';
-        $stm = $this->model->execute($query);
-        if ($data = $this->model->fetchAll($stm)) {
-        	return $data;
-        }
-        return null;
+		$stm = $this->model->execute($query);
+		if ($data = $this->model->fetchAll($stm)) {
+			return $data;
+		}
+		return null;
 	}
 
-	protected function _formatData(array $record)
-	{
+	protected function _formatData(array $record) {
 		$textProcessor = new TextProcessor();
 		$placeholderProcessor = new PlaceholderProcessor();
 		$urlBuilder = new UrlBuilder();
 		$datetimeProcessor = new DatetimeProcessor();
 		$shop = new Shop();
 		$offer = new Offer();
-        if (!($shop_cq_id = $shop->findCqId($record['ch_f5']))) {        	return null;
-        }
+		if (!($shop_cq_id = $shop->findCqId($record['ch_f5']))) {
+			return null;
+		}
 		$redeemNotes = $placeholderProcessor->process($record['txt_f2'], $record);
 		$redeemNotes = $textProcessor->process($redeemNotes);
 		$redeemExceptions = $placeholderProcessor->process($record['ausnahmen'], $record);
@@ -74,7 +73,7 @@ class OfferListener extends AbstractSyncListener {
 		$description = sprintf('<h2>%s</h2>', $record['coupon_small_text_header']) . $record['coupon_small_text'];
 		$description = $placeholderProcessor->process($description, $record);
 		$description = $textProcessor->process($description);
-        $minimum_order_value = $shop->findMinimumOrderValue($record['ch_f5']);
+		$minimum_order_value = $shop->findMinimumOrderValue($record['ch_f5']);
 		$data = [
 			'name' => $textProcessor->decode(sprintf('%s %s', $record['headline'], $record['headlineSmall'])),
 			'description' => strip_tags($description),
@@ -110,21 +109,20 @@ class OfferListener extends AbstractSyncListener {
 	 *
 	 * @return string
 	 */
-	protected function _resolveNumber($number)
-	{
+	protected function _resolveNumber($number) {
 		$number = str_replace('.00', '', $number);
 		if ($number <= 0 || $number === '0.00') {
 			return '';
 		}
 		return (string)$number;
 	}
+
 	/**
 	 * @param array $record
 	 *
 	 * @return int
 	 */
-	protected function _resolveCustomerType(array $record)
-	{
+	protected function _resolveCustomerType(array $record) {
 		if ((!(bool)$record['bool_f9'] && !(bool)$record['bool_f10']) || ((bool)$record['bool_f9'] && (bool)$record['bool_f10'])) {
 			return self::CUSTOMER_ALL; // CONQUEROR:CUSTOMER_TYPE_BOTH
 		}
@@ -135,25 +133,25 @@ class OfferListener extends AbstractSyncListener {
 			return self::CUSTOMER_NEW; // CONQUEROR:CUSTOMER_TYPE_BOTH
 		}
 	}
+
 	/**
 	 * @param array $record
 	 *
 	 * @return int
 	 */
-	protected function _resolveAvailability(array $record)
-	{
+	protected function _resolveAvailability(array $record) {
 		//if ($record['Offer']['is_local']) {
 		//	return 2; // CONQUEROR:AVAILABILITY_OFFLINE
 		//}
 		return 1; // CONQUEROR:AVAILABILITY_ONLINE
 	}
+
 	/**
 	 * @param array $record
 	 *
 	 * @return int
 	 */
-	protected function _resolveType(array $record)
-	{
+	protected function _resolveType(array $record) {
 		$type = $this->_typesMap[$record['f_angebotart']];
 		if (!(bool)$record['freeshipping']) {
 			return $type;

@@ -12,6 +12,7 @@ class TransformPlaceholderLib {
 		'fullDate' => '{DATE}',
 		'shopOfferWorth' => '{AMOUNTTOPOFFER}'
 	);
+
 	/**
 	 * TransformPlaceholderLib::transformSingle()
 	 *
@@ -26,6 +27,7 @@ class TransformPlaceholderLib {
 		}
 		return $content;
 	}
+
 	/**
 	 * TransformPlaceholderLib::transformMulti()
 	 *
@@ -40,6 +42,7 @@ class TransformPlaceholderLib {
 		}
 		return $content;
 	}
+
 	/**
 	 * Transforms Placeholders to actual data
 	 *
@@ -70,6 +73,7 @@ class TransformPlaceholderLib {
 		}
 		return $return;
 	}
+
 	/**
 	 * Checks if a given string has any Placeholders to transform.
 	 *
@@ -84,6 +88,7 @@ class TransformPlaceholderLib {
 		}
 		return false;
 	}
+
 	/**
 	 * TransformPlaceholderLib::_getBestOfferByShop()
 	 *
