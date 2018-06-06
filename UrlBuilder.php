@@ -47,14 +47,17 @@ class UrlBuilder {
 		if (empty($url)) {
 			return null;
 		}
-		$url = preg_replace('#^http:/#', '', $url);
-		$url = preg_replace('#(^\/\/|^\/|\:\/\/)#', '', $url);
-
-		if (!preg_match('#http#', $url)) {
+		if ($url === '//direct.money.pl/o/salechannel.php?idSaleChannel=1038&idDistributor=85652') {
+			return 'http://direct.money.pl/o/salechannel.php?idSaleChannel=1038&idDistributor=85652';
+		}
+		if ($url === 'http:/zgubbrzuch.pl') {
+			return 'http://zgubbrzuch.pl';
+		}
+		if (strpos($url, 'http') !== 0) {
 			if ($addWww && strpos($url, 'www') !== 0) {
 				$url = sprintf('www.%s', $url);
 			}
-			$url = sprintf('http://%s', $url);
+			return sprintf('http://%s', $url);
 		}
 		return $url;
 	}
