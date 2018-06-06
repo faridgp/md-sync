@@ -47,11 +47,14 @@ class UrlBuilder {
 		if (empty($url)) {
 			return null;
 		}
-		if (strpos($url, 'http') !== 0) {
+		$url = preg_replace('#^http:/#', '', $url);
+		$url = preg_replace('#(^\/\/|^\/|\:\/\/)#', '', $url);
+
+		if (!preg_match('#http#', $url)) {
 			if ($addWww && strpos($url, 'www') !== 0) {
 				$url = sprintf('www.%s', $url);
 			}
-			return sprintf('http://%s', $url);
+			$url = sprintf('http://%s', $url);
 		}
 		return $url;
 	}
