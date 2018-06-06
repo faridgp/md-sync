@@ -33,7 +33,8 @@ abstract class AbstractSyncListener {
 		}
 
 		$request = $this->_buildRequest($record);
-		if (empty($request['body'])) {			print_r([
+		if (empty($request['body'])) {
+			print_r([
 				'success' => false,
 				'message' => 'No data found in body',
 				'id' => $this->id
@@ -52,7 +53,8 @@ abstract class AbstractSyncListener {
 					'id' => $this->id,
 					'cq_id' => (empty($response['data']['id']) ? $record['cq_id'] : $response['data']['id'])
 				]);
-			} else {				print_r([
+			} else {
+				print_r([
 					'success' => false,
 					'message' => $response['data']['message'],
 					'id' => $this->id
