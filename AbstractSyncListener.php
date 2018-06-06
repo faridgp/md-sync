@@ -43,6 +43,7 @@ abstract class AbstractSyncListener {
 		$response = $this->_sendRequest($request);
 		if (isset($response['success'])) {
 			if ($response['success'] == 1) {
+				/*
 				if (!empty($response['data']['id'])) {
 					$this->putCgId($response['data']['id']);
 				}
@@ -52,6 +53,8 @@ abstract class AbstractSyncListener {
 					'id' => $this->id,
 					'cq_id' => (empty($response['data']['id']) ? $record['cq_id'] : $response['data']['id'])
 				]);
+				 * 
+				 */
 			} else {
 				print_r([
 					'success' => false,
