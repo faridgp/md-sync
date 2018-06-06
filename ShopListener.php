@@ -256,7 +256,11 @@ class ShopListener extends AbstractSyncListener {
 		if (array_key_exists($domain, $this->_domainsMap)) {
 			return $this->_domainsMap[$domain];
 		}
-		return preg_replace('#\/$#', '', $domain);
+		if (!preg_match('#http#', $domain)) {
+			$domain = 'http://' . $domain;
+		}
+		$url = parse_url($domain);
+		return $url['host'];
 	}
 
 	/**
