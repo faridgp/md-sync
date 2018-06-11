@@ -28,9 +28,9 @@ class OfferListener extends AbstractSyncListener {
 		1 => 2, // CONQUEROR:CUSTOMER_TYPE_OLD
 		2 => 3, // CONQUEROR:CUSTOMER_TYPE_BOTH
 	];
-	const CUSTOMER_NEW = 0;
-	const CUSTOMER_OLD = 1;
-	const CUSTOMER_ALL = 2;
+	const CUSTOMER_NEW = 1;
+	const CUSTOMER_OLD = 2;
+	const CUSTOMER_ALL = 3;
 
 
    	public function __construct(){
@@ -49,9 +49,18 @@ class OfferListener extends AbstractSyncListener {
 
    	protected function _findRecords()
 	{
-		$query = 'SELECT extern_id id FROM ' . $this->_table . ' WHERE ch_f1 != "" ORDER BY cq_id ASC';
+		$limit = ' LIMIT 1, 1000';
+		if (!empty($_GET['page']) && (int)$_GET['page']) {
+			$limit = ' LIMIT ' . ((int)$_GET['page'] * 1000) . ', 1000';
+		}
+		$query = 'SELECT extern_id id FROM ' . $this->_table . ' WHERE ch_f1 != "" ORDER BY cq_id asc, extern_id asc ' . $limit;
+
         $stm = $this->model->execute($query);
         if ($data = $this->model->fetchAll($stm)) {
+        	if (!count($data)) {
+        		echo 'No offers found';
+        		exit;
+        	}
         	return $data;
         }
         return null;
@@ -126,15 +135,14 @@ class OfferListener extends AbstractSyncListener {
         	$name = 'Nawet do ';
         }
 		$name .= $record['headline'] . ' ' . $record['headlineSmall'];
-
 		$data = [
 			'name' => $textProcessor->decode($name),
 			'description' => strip_tags($description),
 			'shop_id' => $shop_cq_id,
-			'review_date' => $datetimeProcessor->process((!empty($record['dat_f6']) && $record['dat_f6'] != '00.00.0000' ? $record['dat_f6'] : ''), true),
+			'review_date' => $datetimeProcessor->process((!empty($record['dat_f6']) && $record['dat_f6'] != '0000-00-00' ? $record['dat_f6'] : date('Y-m-d')), true),
 			'is_active' => (bool)$record['status'],
-			'start_date' => $datetimeProcessor->process((!empty($record['dat_f2']) && $record['dat_f2'] != '00.00.0000' ? $record['dat_f2'] : '') , true),
-			'expires' => $datetimeProcessor->process((!empty($record['dat_f1']) && $record['dat_f1'] != '00.00.0000' ? $record['dat_f1'] : ''), true),
+			'start_date' => $datetimeProcessor->process((!empty($record['dat_f2']) && $record['dat_f2'] != '0000-00-00' ? $record['dat_f2'] : '') , true),
+			'expires' => $datetimeProcessor->process((!empty($record['dat_f1']) && $record['dat_f1'] != '0000-00-00' ? $record['dat_f1'] : ''), true),
 			'customer_type' => $this->_resolveCustomerType($record),
 			'availability' => $this->_resolveAvailability($record),
 			'redeem_notes' => $redeemNotes,

@@ -35,7 +35,7 @@ abstract class AbstractSyncListener {
 		if (empty($request['body'])) {
 			print_r([
 				'success' => false,
-				'message' => 'No data found in body',
+				'message' => 'No data found in body: possibly because the shop [' . $record['ch_f5'] . '] has no cq_id',
 				'id' => $this->id
 			]);
 			return;
@@ -53,7 +53,7 @@ abstract class AbstractSyncListener {
 					'id' => $this->id,
 					'cq_id' => (empty($response['data']['id']) ? $record['cq_id'] : $response['data']['id'])
 				]);
-				 * 
+				 *
 				 */
 			} else {
 				print_r([
