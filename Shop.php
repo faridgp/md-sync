@@ -1,6 +1,6 @@
 <?php
 
-class Shop {	public function putCgId($externId, $cqId, $partner) {
+class Shop {	public function putCqId($externId, $cqId, $partner) {
 		$model = Model::getInstance('live', Config::$connection_data_live);
 		if ($partner === '17d2cb9b') {			$model->execute('UPDATE gsp_shops SET onet_cq_id = ? WHERE extern_id = ?', [$cqId, $externId]);
 		} else {
