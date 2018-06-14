@@ -52,7 +52,7 @@ class OfferListener extends AbstractSyncListener {
 		$limit = ' LIMIT 1, 1000';
 		if (!empty($_GET['page']) && (int)$_GET['page']) {			$limit = ' LIMIT ' . ((int)$_GET['page'] * 1000) . ', 1000';
 		}
-		$query = 'SELECT offer.extern_id id FROM ' . $this->_table . ' offer left join gsp_shops shop on (offer.ch_f5 = shop.extern_id and NOT ISNULL(shop.' . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . ')) WHERE offer.ch_f1 != "" ORDER BY offer.' . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . ' asc, offer.extern_id asc ' . $limit;
+		$query = 'SELECT offer.extern_id id FROM ' . $this->_table . ' offer left join gsp_shops shop on (offer.ch_f5 = shop.extern_id and NOT ISNULL(shop.' . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . ')) WHERE offer.ch_f1 != ""  and NOT ISNULL(shop.' . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . ') ORDER BY offer.' . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . ' asc, offer.extern_id asc ' . $limit;
 
         $stm = $this->model->execute($query);
         if ($data = $this->model->fetchAll($stm)) {        	if (!count($data)) {        		echo 'No offers found';
