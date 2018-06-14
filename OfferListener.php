@@ -50,15 +50,12 @@ class OfferListener extends AbstractSyncListener {
    	protected function _findRecords()
 	{
 		$limit = ' LIMIT 1, 1000';
-		if (!empty($_GET['page']) && (int)$_GET['page']) {
-			$limit = ' LIMIT ' . ((int)$_GET['page'] * 1000) . ', 1000';
+		if (!empty($_GET['page']) && (int)$_GET['page']) {			$limit = ' LIMIT ' . ((int)$_GET['page'] * 1000) . ', 1000';
 		}
-		$query = 'SELECT extern_id id FROM ' . $this->_table . ' WHERE ch_f1 != "" ORDER BY cq_id asc, extern_id asc ' . $limit;
+		$query = 'SELECT extern_id id FROM ' . $this->_table . ' WHERE ch_f1 != "" ORDER BY ' . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . ' asc, extern_id asc ' . $limit;
 
         $stm = $this->model->execute($query);
-        if ($data = $this->model->fetchAll($stm)) {
-        	if (!count($data)) {
-        		echo 'No offers found';
+        if ($data = $this->model->fetchAll($stm)) {        	if (!count($data)) {        		echo 'No offers found';
         		exit;
         	}
         	return $data;
@@ -74,8 +71,7 @@ class OfferListener extends AbstractSyncListener {
 		$datetimeProcessor = new DatetimeProcessor();
 		$shop = new Shop();
 		$offer = new Offer();
-        if (!($shop_cq_id = $shop->findCqId($record['ch_f5']))) {
-        	return null;
+        if (!($shop_cq_id = $shop->findCqId($record['ch_f5'], $this->partner))) {        	return null;
         }
 		$redeemNotes = $placeholderProcessor->process($record['txt_f2'], $record);
 		$redeemNotes = $textProcessor->process($redeemNotes);
@@ -129,10 +125,8 @@ class OfferListener extends AbstractSyncListener {
                 $record['headline'] = $euro . $currency. ' rabatu';
             }
 
-        if ($record['f_angebotart'] == 5) {
-        	$name = 'Bon upominkowy ';
-        } elseif ($record['till']) {
-        	$name = 'Nawet do ';
+        if ($record['f_angebotart'] == 5) {        	$name = 'Bon upominkowy ';
+        } elseif ($record['till']) {        	$name = 'Nawet do ';
         }
 		$name .= $record['headline'] . ' ' . $record['headlineSmall'];
 		$data = [
@@ -225,9 +219,9 @@ class OfferListener extends AbstractSyncListener {
 		return $type;
 	}
 
-	public function putCgId($cqId) {
+	public function putCqId($cqId) {
 		$offer = new Offer();
-		$offer->putCgId($this->id, $cqId);
+		$offer->putCqId($this->id, $cqId, $this->partner);
 	}
 
 	private function prepareEuro($value){

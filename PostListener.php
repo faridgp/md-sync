@@ -27,7 +27,7 @@ class PostListener extends AbstractSyncListener {
 		 28 => 1, // Krzysztof Nalepa
 		 26 => 1, // ?ucja Stachura
 		 27 => 1, // Ma?gorzata Mrozek
-		 //=> 23, // Julia Mï¿½ller
+		 //=> 23, // Julia Müller
 		 //=> 24, // Melanie Werner
 		 //=> 25, // Julian Daquila
 		 //=> 26, // Anja Fujawa
@@ -35,7 +35,7 @@ class PostListener extends AbstractSyncListener {
 		 //=> 27, // Maria Wolff
 		 //=> 28, // Julius Hilker
 		 //=> 29, // Claudia Obritzhauser
-		 //=> 30, // Margarete Schï¿½cking
+		 //=> 30, // Margarete Schücking
 		 //=> 31, // Aileen Rost
 		 //=> 1, // Laura ??? => Admin
 		 //=> 1, // Wenzel ??? => Admin
@@ -43,7 +43,7 @@ class PostListener extends AbstractSyncListener {
 		 //=> 1, // Sarah ??? => Admin
 		 //=> 1, // Arlidna ??? => Admin
 		 //=> 6, // Tina Rodriguez
-		 //=> 32, // Jennifer Dï¿½hnfort
+		 //=> 32, // Jennifer Dühnfort
 		 //=> 33, // Sibylle Ploch
 		 //=> 34, // Michaela Niemeyer
 		 //=> 1, // Mario ??? => Admin
@@ -54,11 +54,16 @@ class PostListener extends AbstractSyncListener {
 		 //=> 40, // Fabian Kuhn
 	];
 
-	public function __construct() {
-		parent::__construct();
-	}
+    public function __construct(){
+        parent::__construct();
 
-	protected function _findRecord() {
+    }
+
+    protected function _findRecord()
+	{
+		if ($this->partner === '17d2cb9b') {
+        	$this->_prefix = 'onet_blog';
+        }
 		$query = 'select
 					ID id,
 					post_title,
@@ -73,33 +78,33 @@ class PostListener extends AbstractSyncListener {
 					(
 						SELECT
 							' . $this->_prefix . '_terms.term_id
-						FROM
-							' . $this->_prefix . '_terms
-						INNER JOIN
-							' . $this->_prefix . '_term_taxonomy
-						ON ' . $this->_prefix . '_terms.term_id = ' . $this->_prefix . '_term_taxonomy.term_id
-						INNER JOIN
-							' . $this->_prefix . '_term_relationships
-						ON ' . $this->_prefix . '_term_relationships.term_taxonomy_id = ' . $this->_prefix . '_term_taxonomy.term_taxonomy_id
-						WHERE
-							taxonomy= "category" AND
-							' . $this->_prefix . '_term_relationships.object_id = ' . $this->id . '
+					    FROM
+					    	' . $this->_prefix . '_terms
+					    INNER JOIN
+					    	' . $this->_prefix . '_term_taxonomy
+					   	ON ' . $this->_prefix . '_terms.term_id = ' . $this->_prefix . '_term_taxonomy.term_id
+					    INNER JOIN
+					    	' . $this->_prefix . '_term_relationships
+					    ON ' . $this->_prefix . '_term_relationships.term_taxonomy_id = ' . $this->_prefix . '_term_taxonomy.term_taxonomy_id
+					    WHERE
+					    	taxonomy= "category" AND
+					    	' . $this->_prefix . '_term_relationships.object_id = ' . $this->id . '
 						LIMIT 1
 					) AS "post_category_id",
 					(
 						SELECT
 							GROUP_CONCAT(' . $this->_prefix . '_terms.name SEPARATOR ", ")
-						FROM
-							' . $this->_prefix . '_terms
-						INNER JOIN
-							' . $this->_prefix . '_term_taxonomy
-						ON ' . $this->_prefix . '_terms.term_id = ' . $this->_prefix . '_term_taxonomy.term_id
-						INNER JOIN
-							' . $this->_prefix . '_term_relationships
-						ON ' . $this->_prefix . '_term_relationships.term_taxonomy_id = ' . $this->_prefix . '_term_taxonomy.term_taxonomy_id
-						WHERE
-							taxonomy= "post_tag" AND
-							' . $this->_prefix . '_posts.ID = ' . $this->_prefix . '_term_relationships.object_id
+					    FROM
+					    	' . $this->_prefix . '_terms
+					    INNER JOIN
+					    	' . $this->_prefix . '_term_taxonomy
+					    ON ' . $this->_prefix . '_terms.term_id = ' . $this->_prefix . '_term_taxonomy.term_id
+					    INNER JOIN
+					    	' . $this->_prefix . '_term_relationships
+					    ON ' . $this->_prefix . '_term_relationships.term_taxonomy_id = ' . $this->_prefix . '_term_taxonomy.term_taxonomy_id
+					    WHERE
+					    	taxonomy= "post_tag" AND
+					    	' . $this->_prefix . '_posts.ID = ' . $this->_prefix . '_term_relationships.object_id
 					) AS "Tags",
 					(
 						SELECT
@@ -119,7 +124,7 @@ class PostListener extends AbstractSyncListener {
 							' . $this->_prefix . '_postmeta.meta_key = "_yoast_wpseo_metadesc" AND
 							' . $this->_prefix . '_postmeta.post_id = ' . $this->_prefix . '_posts.ID
 					) AS yoast_wpseo_metadesc,
-					(
+        			(
 						SELECT
 							meta_value
 						FROM
@@ -159,48 +164,52 @@ class PostListener extends AbstractSyncListener {
 				from
 					' . $this->_prefix . '_posts
 				JOIN
-					' . $this->_prefix . '_term_relationships
-				ON ' . $this->_prefix . '_posts.ID = ' . $this->_prefix . '_term_relationships.object_id
-				JOIN
-					' . $this->_prefix . '_term_taxonomy
-				ON ' . $this->_prefix . '_term_relationships.term_taxonomy_id = ' . $this->_prefix . '_term_taxonomy.term_taxonomy_id
-				JOIN
-					' . $this->_prefix . '_terms
-				ON ' . $this->_prefix . '_term_taxonomy.term_id = ' . $this->_prefix . '_terms.term_id
+			    	' . $this->_prefix . '_term_relationships
+			     ON ' . $this->_prefix . '_posts.ID = ' . $this->_prefix . '_term_relationships.object_id
+			     JOIN
+			     	' . $this->_prefix . '_term_taxonomy
+			     ON ' . $this->_prefix . '_term_relationships.term_taxonomy_id = ' . $this->_prefix . '_term_taxonomy.term_taxonomy_id
+			     JOIN
+			     	' . $this->_prefix . '_terms
+			     ON ' . $this->_prefix . '_term_taxonomy.term_id = ' . $this->_prefix . '_terms.term_id
 				where
 					post_type = "post" AND
 					' . $this->_prefix . '_term_taxonomy.taxonomy= "category" AND
 					(ID="' . $this->id . '")';
 
-		 $stm = $this->model->execute($query, [$this->id]);
-		if ($data = $this->model->fetch($stm)) {
-			return $data;
-		}
-		return null;
+        $stm = $this->model->execute($query, [$this->id]);
+        if ($data = $this->model->fetch($stm)) {
+        	return $data;
+        }
+        return null;
 	}
 
-	protected function _findRecords() {
-		$query = 'select
-					ID id
+   	protected function _findRecords()
+	{
+        if ($this->partner === '17d2cb9b') {
+        	$this->_prefix = 'onet_blog';
+        }
+        $query = 'select
+        			ID id
 				from
 					' . $this->_prefix . '_posts
 				where
 					post_type = "post"';
-		$stm = $this->model->execute($query);
-		if ($data = $this->model->fetchAll($stm)) {
-			return $data;
-		}
-		return null;
+        $stm = $this->model->execute($query);
+        if ($data = $this->model->fetchAll($stm)) {
+        	return $data;
+        }
+        return null;
 	}
 
-	protected function _formatData(array $record) {
+    protected function _formatData(array $record)
+	{
 		$textProcessor = new TextProcessor();
 		$placeholderProcessor = new PlaceholderProcessor();
 		$urlBuilder = new UrlBuilder();
 		$datetimeProcessor = new DatetimeProcessor();
 		$excerpt = strip_tags($textProcessor->process($record['post_excerpt']));
-		if (empty($this->_categoriesMap[$record['post_category_id']])) {
-			return null;
+		if (empty($this->_categoriesMap[$record['post_category_id']])) {			return null;
 		}
 
 		$data = [
@@ -224,10 +233,11 @@ class PostListener extends AbstractSyncListener {
 		return $data;
 	}
 
-	public function putCgId($cqId) {
+	public function putCqId($cqId) {
 		$post = new Post();
-		$post->putCgId($this->id, $cqId);
+		$post->putCqId($this->id, $cqId, $this->partner);
 	}
 }
+
 
 ?>

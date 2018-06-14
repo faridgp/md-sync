@@ -3,89 +3,88 @@ class ShopListener extends AbstractSyncListener {
 	protected $_table = 'gsp_shops';
 	protected $_endpoint = 'shops';
 	protected $_categoriesMap = [
-		10083 => 28,
-		10059 => 2,
-		10072 => 3,
-		10092 => 3,
-		10093 => 3,
-		10001 => 4,
-		10027 => 4,
-		10029 => 4,
-		10028 => 4,
-		10026 => 4,
-		10065 => 29,
-		10012 => 30,
-		10030 => 30,
-		10075 => 5,
-		10007 => 8,
-		10037 => 8,
-		10091 => 8,
-		10038 => 8,
-		10040 => 12,
-		10041 => 12,
-		10096 => 12,
-		10071 => 12,
-		10042 => 12,
-		10044 => 31,
-		10098 => 31,
-		10097 => 31,
-		10013 => 19,
-		10079 => 10,
-		10087 => 10,
-		10089 => 10,
-		10004 => 10,
-		10032 => 11,
-		10033 => 11,
-		10080 => 11,
-		10061 => 15,
-		10101 => 15,
-		10090 => 15,
-		10002 => 24,
-		10100 => 24,
-		10046 => 24,
-		10099 => 24,
-		10088 => 27,
-		10003 => 1,
-		10050 => 1,
-		10051 => 1,
-		10077 => 1,
-		10103 => 1,
-		10112 => 1,
-		10039 => 33,
-		10094 => 33,
-		10109 => 33,
-		10049 => 35,
-		10009 => 7,
-		10008 => 7,
-		10005 => 27,
-		10078 => 27,
-		10104 => 27,
-		10066 => 27,
-		10056 => 27,
-		10073 => 14,
-		10062 => 25,
-		10107 => 25,
-		10106 => 25,
-		10105 => 25,
-		10011 => 26,
-		10055 => 20,
-		10074 => 34,
+		10083 => 37,
+		10059 => 57,
+		10072 => 42,
+		10001 => 64,
+		10027 => 64,
+		10029 => 64,
+		10028 => 64,
+		10026 => 64,
+		10065 => 40,
+		10012 => 54,
+		10030 => 54,
+		10075 => 53,
+		10007 => 52,
+		10037 => 52,
+		10036 => 52,
+		10038 => 52,
+		10085 => 52,
+		10091 => 52,
+		10040 => 38,
+		10041 => 38,
+		10096 => 38,
+		10071 => 38,
+		10076 => 38,
+		10042 => 38,
+		10044 => 46,
+		10098 => 46,
+		10097 => 46,
+		10013 => 41,
+		10079 => 49,
+		10087 => 50,
+		10004 => 58,
+		10032 => 54,
+		10033 => 54,
+		10061 => 43,
+		10002 => 51,
+		10045 => 51,
+		10046 => 51,
+		10060 => 51,
+		10100 => 51,
+		10099 => 51,
+		10003 => 56,
+		10050 => 56,
+		10051 => 56,
+		10077 => 56,
+		10089 => 56,
+		10103 => 56,
+		10112 => 56,
+		10082 => 56,
+		10039 => 45,
+		10094 => 45,
+		10109 => 45,
+		10049 => 60,
+		10009 => 63,
+		10008 => 44,
+		10005 => 59,
+		10078 => 59,
+		10104 => 59,
+		10066 => 59,
+		10056 => 59,
+		10057 => 59,
+		10088 => 59,
+		10073 => 62,
+		10062 => 61,
+		10107 => 61,
+		10106 => 61,
+		10105 => 61,
+		10011 => 39,
+		10055 => 65,
+		10074 => 47,
+		10084 => 48,
+		10086 => 55,
 		// UNSORTED
 		10014 => 36,
 		10063 => 36,
 		10067 => 36,
 		10068 => 36,
 		10070 => 36,
-		10084 => 36,
-		10085 => 36,
-		10086 => 36,
-		// MISSING RELATION
-		10045 => 36,
-		10060 => 36,
-		10076 => 36,
-		10036 => 36,
-		10057 => 36,
-		10082 => 36,
+		10080 => 36,
+		10092 => 36,
+		10093 => 36,
+		10101 => 36,
+		10090 => 36,
 		10081 => 36,
 		0 => 36,
 	];
@@ -150,9 +149,7 @@ class ShopListener extends AbstractSyncListener {
 		parent::__construct();
 	}
 
-	protected function _findRecords() {
-		$query = "SELECT extern_id id FROM " . $this->_table . " WHERE ch_f1 != '' ORDER BY cq_id ASC";
-		$stm = $this->model->execute($query);
+	protected function _findRecords() {		$query = "SELECT extern_id id FROM " . $this->_table . " WHERE ch_f1 != '' AND (lockedPartners NOT LIKE '%" . $this->partner . "%' OR ISNULL(lockedPartners) OR lockedPartners = '') ORDER BY " . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . " ASC";		$stm = $this->model->execute($query);
 		if ($data = $this->model->fetchAll($stm)) {
 			return $data;
 		}
@@ -166,7 +163,20 @@ class ShopListener extends AbstractSyncListener {
 
 		$query = "SELECT *, extern_id id FROM " . $this->_table . " WHERE extern_id = ? AND ch_f1 != ''";
 		$stm = $this->model->execute($query, [$this->id]);
+		$data2 = [];
+		if ($this->partner === '17d2cb9b') {
+			  $query2 = "SELECT txt_f2, txt_f3, vorspannText, txt_f19, txt_f21  FROM gsp_shops_seo_partners WHERE extern_id = ? AND partner = ?";
+			  $stm2 = $this->model->execute($query2, [$this->id, $this->partner]);
+			  $data2 = $this->model->fetch($stm2);
+		}
 		if ($data = $this->model->fetch($stm)) {
+			if (!empty($data2)) {
+				$data['txt_f2'] = $data2['txt_f2'];
+				$data['txt_f3'] = $data2['txt_f3'];
+				$data['vorspannText'] = $data2['vorspannText'];
+				$data['txt_f19'] = $data2['txt_f19'];
+				$data['txt_f21'] = $data2['txt_f21'];
+			}
 			return $data;
 		}
 		return null;
@@ -232,9 +242,9 @@ class ShopListener extends AbstractSyncListener {
 			'payment_methods' => $this->_formatPaymentMethods($record),
 			'delivery_methods' => $this->_formatDeliveryMethods($record),
 		];
-		if (empty($record['cq_id'])) {
+		if (($this->partner === '0123456789' && empty($record['cq_id'])) || ($this->partner === '17d2cb9b' && empty($record['onet_cq_id']))) {
 			$data += [
-				'name' => $textProcessor->decode($record['ch_f1']),
+				'name' => $textProcessor->decode($record['ch_f1']) . ' PL',
 				'slug' => trim(strtolower($record['ch_f4'])),
 			];
 		}
@@ -340,9 +350,9 @@ class ShopListener extends AbstractSyncListener {
 		return $return;
 	}
 
-	public function putCgId($cqId) {
+	public function putCqId($cqId) {
 		$shop = new Shop();
-		$shop->putCgId($this->id, $cqId);
+		$shop->putCqId($this->id, $cqId, $this->partner);
 	}
 }
 

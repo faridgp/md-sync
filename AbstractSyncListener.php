@@ -4,6 +4,7 @@ abstract class AbstractSyncListener {
 	protected $_token = 'sCJOuLzksiHieEQVktovNH0xyJSipfFY';
 	protected $_baseUrl = 'http://md-conqueror-01.menschdanke.io/api/v1';
 	public $id = 0;
+	public $partner = '0123456789';
 	protected $_cq_id = 0;
 	protected $request;
 	protected $model;
@@ -40,11 +41,12 @@ abstract class AbstractSyncListener {
 			]);
 			return;
 		}
+
 		$response = $this->_sendRequest($request);
 		if (isset($response['success'])) {
 			if ($response['success'] == 1) {
 				if (!empty($response['data']['id'])) {
-					$this->putCgId($response['data']['id']);
+					$this->putCqId($response['data']['id']);
 				}
 				/*
 				print_r([
