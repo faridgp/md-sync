@@ -128,7 +128,11 @@ class OfferListener extends AbstractSyncListener {
         if ($record['f_angebotart'] == 5) {        	$name = 'Bon upominkowy ';
         } elseif ($record['till']) {        	$name = 'Nawet do ';
         }
-		$name .= $record['headline'] . ' ' . $record['headlineSmall'];
+		$if (!$record['headline'] && !$record['headlineSmall']) {
+			$name .= $record['ch_f12'];
+		} else {
+			$name .= $record['headline'] . ' ' . $record['headlineSmall'];
+		}
 		$data = [
 			'name' => $textProcessor->decode($name),
 			'description' => strip_tags($description),
