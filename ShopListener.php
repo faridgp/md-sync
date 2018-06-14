@@ -245,7 +245,7 @@ class ShopListener extends AbstractSyncListener {
 		if (($this->partner === '0123456789' && empty($record['cq_id'])) || ($this->partner === '17d2cb9b' && empty($record['onet_cq_id']))) {
 			$data += [
 				'name' => $textProcessor->decode($record['ch_f1']) . ' PL',
-				'slug' => trim(strtolower($record['ch_f4'])),
+				'slug' => trim(strtolower($record['ch_f4'])) . '-pl',
 			];
 		}
 		$metaTitle = $placeholderProcessor->process($record['meta_title'], $record);

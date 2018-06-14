@@ -48,15 +48,12 @@ abstract class AbstractSyncListener {
 				if (!empty($response['data']['id'])) {
 					$this->putCqId($response['data']['id']);
 				}
-				/*
 				print_r([
 					'success' => true,
 					'result' => (empty($response['data']['id']) ? 'Updated' : 'Posted'),
 					'id' => $this->id,
 					'cq_id' => (empty($response['data']['id']) ? $record['cq_id'] : $response['data']['id'])
 				]);
-				 *
-				 */
 			} else {
 				print_r([
 					'success' => false,
