@@ -27,7 +27,7 @@ class PostListener extends AbstractSyncListener {
 		 28 => 1, // Krzysztof Nalepa
 		 26 => 1, // ?ucja Stachura
 		 27 => 1, // Ma?gorzata Mrozek
-		 //=> 23, // Julia Müller
+		 //=> 23, // Julia Mï¿½ller
 		 //=> 24, // Melanie Werner
 		 //=> 25, // Julian Daquila
 		 //=> 26, // Anja Fujawa
@@ -35,7 +35,7 @@ class PostListener extends AbstractSyncListener {
 		 //=> 27, // Maria Wolff
 		 //=> 28, // Julius Hilker
 		 //=> 29, // Claudia Obritzhauser
-		 //=> 30, // Margarete Schücking
+		 //=> 30, // Margarete Schï¿½cking
 		 //=> 31, // Aileen Rost
 		 //=> 1, // Laura ??? => Admin
 		 //=> 1, // Wenzel ??? => Admin
@@ -43,7 +43,7 @@ class PostListener extends AbstractSyncListener {
 		 //=> 1, // Sarah ??? => Admin
 		 //=> 1, // Arlidna ??? => Admin
 		 //=> 6, // Tina Rodriguez
-		 //=> 32, // Jennifer Dühnfort
+		 //=> 32, // Jennifer Dï¿½hnfort
 		 //=> 33, // Sibylle Ploch
 		 //=> 34, // Michaela Niemeyer
 		 //=> 1, // Mario ??? => Admin
@@ -54,16 +54,14 @@ class PostListener extends AbstractSyncListener {
 		 //=> 40, // Fabian Kuhn
 	];
 
-    public function __construct(){
-        parent::__construct();
+	public function __construct($partner) {
+		parent::__construct($partner);
+	}
 
-    }
-
-    protected function _findRecord()
-	{
+	protected function _findRecord() {
 		if ($this->partner === '17d2cb9b') {
-        	$this->_prefix = 'onet_blog';
-        }
+			$this->_prefix = 'onet_blog';
+		}
 		$query = 'select
 					ID id,
 					post_title,
@@ -177,39 +175,38 @@ class PostListener extends AbstractSyncListener {
 					' . $this->_prefix . '_term_taxonomy.taxonomy= "category" AND
 					(ID="' . $this->id . '")';
 
-        $stm = $this->model->execute($query, [$this->id]);
-        if ($data = $this->model->fetch($stm)) {
-        	return $data;
-        }
-        return null;
+		$stm = $this->model->execute($query, [$this->id]);
+		if ($data = $this->model->fetch($stm)) {
+			return $data;
+		}
+		return null;
 	}
 
-   	protected function _findRecords()
-	{
-        if ($this->partner === '17d2cb9b') {
-        	$this->_prefix = 'onet_blog';
-        }
-        $query = 'select
-        			ID id
+	protected function _findRecords() {
+		if ($this->partner === '17d2cb9b') {
+			$this->_prefix = 'onet_blog';
+		}
+		$query = 'select
+					ID id
 				from
 					' . $this->_prefix . '_posts
 				where
 					post_type = "post"';
-        $stm = $this->model->execute($query);
-        if ($data = $this->model->fetchAll($stm)) {
-        	return $data;
-        }
-        return null;
+		$stm = $this->model->execute($query);
+		if ($data = $this->model->fetchAll($stm)) {
+			return $data;
+		}
+		return null;
 	}
 
-    protected function _formatData(array $record)
-	{
+	protected function _formatData(array $record) {
 		$textProcessor = new TextProcessor();
 		$placeholderProcessor = new PlaceholderProcessor();
 		$urlBuilder = new UrlBuilder();
 		$datetimeProcessor = new DatetimeProcessor();
 		$excerpt = strip_tags($textProcessor->process($record['post_excerpt']));
-		if (empty($this->_categoriesMap[$record['post_category_id']])) {			return null;
+		if (empty($this->_categoriesMap[$record['post_category_id']])) {
+			return null;
 		}
 
 		$data = [
@@ -238,6 +235,4 @@ class PostListener extends AbstractSyncListener {
 		$post->putCqId($this->id, $cqId, $this->partner);
 	}
 }
-
-
 ?>

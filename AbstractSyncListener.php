@@ -1,7 +1,8 @@
 <?php
 abstract class AbstractSyncListener {
 
-	protected $_token = 'sCJOuLzksiHieEQVktovNH0xyJSipfFY';
+	protected $_token = ['0123456789' => 'sCJOuLzksiHieEQVktovNH0xyJSipfFY', '17d2cb9b' => 'mWedEWkKHeZ5eBDrxqUYKKZdxR4GM2yM'];
+	protected $_partner_names = ['0123456789' => 'Tanio', '17d2cb9b' => 'Onet'];
 	protected $_baseUrl = 'http://md-conqueror-01.menschdanke.io/api/v1';
 	public $id = 0;
 	public $partner = '0123456789';
@@ -11,8 +12,16 @@ abstract class AbstractSyncListener {
 	protected $_shopExcludeIds = [];
 	protected $_offerExcludeIds = [];
 
-	public function __construct() {
+	public function __construct($partner) {
 		$this->model = Model::getInstance('live', Config::$connection_data_live);
+
+		if (!empty($partner)) {
+			$this->partner = $partner;
+		}
+		if (empty($this->_token[$this->partner])) {
+			die('No valid Token found');
+		}
+		echo '<br>You are Syncing the data of <b>' . $this->_partner_names[$this->partner] . '</b><br>';
 	}
 
 	public function synchronizeAll() {
@@ -95,7 +104,7 @@ abstract class AbstractSyncListener {
 		$request = [
 			'header' => [
 				'Time-Zone: Europe/Berlin',
-				'X-Api-Token: ' . $this->_token,
+				'X-Api-Token: ' . $this->_token[$this->partner],
 				'Accept: application/json',
 				'Content-Type: application/x-www-form-urlencoded'
 			],

@@ -145,11 +145,13 @@ class ShopListener extends AbstractSyncListener {
 		15 => 15, // K-EX
 	];
 
-	public function __construct() {
-		parent::__construct();
+	public function __construct($partner){
+		parent::__construct($partner);
 	}
 
-	protected function _findRecords() {		$query = "SELECT extern_id id FROM " . $this->_table . " WHERE ch_f1 != '' AND (lockedPartners NOT LIKE '%" . $this->partner . "%' OR ISNULL(lockedPartners) OR lockedPartners = '') ORDER BY " . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . " ASC";		$stm = $this->model->execute($query);
+	protected function _findRecords() {
+		$query = "SELECT extern_id id FROM " . $this->_table . " WHERE ch_f1 != '' AND (lockedPartners NOT LIKE '%" . $this->partner . "%' OR ISNULL(lockedPartners) OR lockedPartners = '') ORDER BY " . ($this->partner === '17d2cb9b' ? 'onet_cq_id' : 'cq_id') . " ASC";
+		$stm = $this->model->execute($query);
 		if ($data = $this->model->fetchAll($stm)) {
 			return $data;
 		}
@@ -165,7 +167,7 @@ class ShopListener extends AbstractSyncListener {
 		$stm = $this->model->execute($query, [$this->id]);
 		$data2 = [];
 		if ($this->partner === '17d2cb9b') {
-			  $query2 = "SELECT txt_f2, txt_f3, vorspannText, txt_f19, txt_f21  FROM gsp_shops_seo_partners WHERE extern_id = ? AND partner = ?";
+			  $query2 = "SELECT txt_f2, txt_f3, vorspannText, txt_f19, txt_f21, meta_title, meta_description  FROM gsp_shops_seo_partners WHERE extern_id = ? AND partner = ?";
 			  $stm2 = $this->model->execute($query2, [$this->id, $this->partner]);
 			  $data2 = $this->model->fetch($stm2);
 		}
@@ -176,9 +178,13 @@ class ShopListener extends AbstractSyncListener {
 				$data['vorspannText'] = $data2['vorspannText'];
 				$data['txt_f19'] = $data2['txt_f19'];
 				$data['txt_f21'] = $data2['txt_f21'];
+				$data['meta_title'] = $data2['meta_title'];
+				$data['meta_description'] = $data2['meta_description'];
 			}
+
 			return $data;
 		}
+
 		return null;
 	}
 
@@ -201,8 +207,14 @@ class ShopListener extends AbstractSyncListener {
 
 		$minimumOrderLabel = $this->_formatMinimumOrderLabel($record['mbw_short']);
 
-		$domain = $this->_formatDomain($record['ch_f5']);
-
+		$domain = $this->_formatDomain(trim($record['ch_f5']));
+		if ($this->id == 11977) {
+			$domain = 	'myled.pl';
+			$record['screenshotUrl'] = 'https://myled.pl';
+		}
+		if (in_array($this->id, [11355, 10179, 11977])) {
+			$record['ch_f2'] = 	$domain;
+		}
 		$data = [
 			'shop_category_id' => $this->_categoriesMap[$record['breadcrumb']],
 			'domain' => $domain,
@@ -216,14 +228,14 @@ class ShopListener extends AbstractSyncListener {
 
 			'inheritance' => [
 				'legacy_tanio_id' => $record['id'],
-				'slug' => trim(strtolower($record['ch_f4'])),
+				'slug' => trim(strtolower(trim($record['ch_f4']))),
 				'name' => $textProcessor->decode($record['ch_f1']),
 				'description' => $description,
 				'excerpt' => $excerpt,
 				'clickout_url' => $urlBuilder->getValidUrl($record['ch_f2']),
 				'show_expired_offers' => (bool)$record['show_expired_offers'],
-				'meta_title' => '',
-				'meta_description' => '',
+				'meta_title' => $textProcessor->decode($placeholderProcessor->processDates($placeholderProcessor->processPlaceholders($this->_setMetaTitle($record['meta_title']), $record))),
+				'meta_description' => $textProcessor->decode($placeholderProcessor->processDates($placeholderProcessor->processPlaceholders($this->_setMetaDescription($record['meta_description']), $record))),
 				'is_active' => (bool)$record['bool_f1'],
 				'shop_redeem_notes' => [
 					[
@@ -242,19 +254,47 @@ class ShopListener extends AbstractSyncListener {
 			'payment_methods' => $this->_formatPaymentMethods($record),
 			'delivery_methods' => $this->_formatDeliveryMethods($record),
 		];
+
 		if (($this->partner === '0123456789' && empty($record['cq_id'])) || ($this->partner === '17d2cb9b' && empty($record['onet_cq_id']))) {
 			$data += [
 				'name' => $textProcessor->decode($record['ch_f1']) . ' PL',
-				'slug' => trim(strtolower($record['ch_f4'])) . '-pl',
+				'slug' => trim(strtolower(trim($record['ch_f4']))) . '-pl',
 			];
 		}
-		$metaTitle = $placeholderProcessor->process($record['meta_title'], $record);
-		$metaTitle = $textProcessor->decode($metaTitle);
-		$metaDescription = $placeholderProcessor->process($record['meta_description'], $record);
-		$metaDescription = $textProcessor->decode($metaDescription);
-		$data['inheritance']['meta_title'] = $metaTitle;
-		$data['inheritance']['meta_description'] = $metaDescription;
 		return $data;
+	}
+
+	protected function _setMetaTitle($title) {
+		if (!$title) {
+		 	$title = $this->_getMeta('title');
+		}
+
+		if (!$title) {
+			$title = "##SKLEP## kupony rabatowe &bull; ##MIESIAC## ##ROK## ##WARTOŚĆ## promocje";
+		}
+		return $title;
+	}
+
+	protected function _setMetaDescription($description) {
+		if (!$description) {
+		 	$description = $this->_getMeta('description');
+		}
+		if (!$description) {
+			$description = 'Sprawdź kupony rabatowe w ##SKLEP## ##ROK##. Wykorzystaj darmowy kod rabatowy i oszczędzaj na nim ##WARTOŚĆ## ✓ Za darmo ✓ Bez rejestracji';
+		}
+		return $description;
+	}
+
+	protected function _getMeta($meta){
+		switch ($this->partner){
+			case ('17d2cb9b') :	if ($meta === 'title') return '##SKLEP## kod rabatowy ##WARTOŚĆ## - ##MIESIAC## ##ROK## | kupony rabatowe | onet.pl';
+								if ($meta === 'description') return '##SKLEP## kody rabatowe - ##WARTOŚĆ## ##MIESIAC## ##ROK## - Wykorzystaj darmowe kupony rabatowe i oszczędzaj na zakupach';
+								break;
+			default :				if ($meta === 'title') return '##SKLEP## kupony rabatowe &bull; ##MIESIAC## ##ROK## ##WARTOŚĆ## kod rabatowy';
+									if ($meta === 'description') return 'Sprawdź kupony rabatowe w  ##SKLEP## ##ROK##. Wykorzystaj darmowy kod rabatowy i oszczędzaj na nim ##WARTOŚĆ## ✓ Za darmo ✓ Bez rejestracji';
+									break;
+
+		}
 	}
 
 	/**
